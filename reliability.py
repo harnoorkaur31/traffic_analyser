@@ -23,8 +23,8 @@ def evaluate_route(row):
     late_p = row['late_percent']
 
     # start at 100 and subtract points for delays
-    # meant to use median too so outliers dont ruin score, hope this formula is right
-    score = 100 - (avg_d * 1.5) - (avg_d * 0.5)
+    # fixed formula to weight median higher so 1 outlier doesnt destroy the score
+    score = 100 - (avg_d * 0.5) - (med_d * 1.5)
 
     if score < 0:
         score = 0
@@ -36,7 +36,6 @@ def evaluate_route(row):
     elif max_d > 30 and med_d <= 5:
         status = "Reliable (One Extreme Delay)"
         reason = "Median delay is low, avg is only high because of one bad day"
-    # fixed this to >= 40 bc R404 was showing up as reliable by mistake
     elif late_p >= 40:
         status = "Inconsistent"
         reason = "Late a couple times a week, hard to predict"
@@ -47,7 +46,7 @@ def evaluate_route(row):
     return pd.Series([round(score, 1), status, reason])
 
 
-# new function for weekday comparison
+# function for weekday comparison
 def get_weekday_summary(df):
     day_order = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
     
