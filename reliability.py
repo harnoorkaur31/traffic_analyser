@@ -36,7 +36,8 @@ def evaluate_route(row):
     elif max_d > 30 and med_d <= 5:
         status = "Reliable (One Extreme Delay)"
         reason = "Median delay is low, avg is only high because of one bad day"
-    elif late_p > 40:
+    # fixed this to >= 40 bc R404 was showing up as reliable by mistake
+    elif late_p >= 40:
         status = "Inconsistent"
         reason = "Late a couple times a week, hard to predict"
     else:
@@ -44,3 +45,20 @@ def evaluate_route(row):
         reason = "Stays on schedule most of the time"
 
     return pd.Series([round(score, 1), status, reason])
+
+
+# new function for weekday comparison
+def get_weekday_summary(df):
+    day_order = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+    
+    # group by day and get mean, median, and max
+    weekday_stats = df.groupby('day').agg(
+        avg_delay=('delay_mins', 'mean'),
+        median_delay=('delay_mins', 'median'),
+        max_delay=('delay_mins', 'max'),
+        late_buses=('is_late', 'sum')
+    )
+    
+    # reindex so it prints Mon-Fri instead of alphabetical
+    weekday_stats = weekday_stats.reindex(day_order)
+    return weekday_stats
