@@ -1,7 +1,7 @@
 import pandas as pd
 
 def load_transport_data():
-    # using mins from midnight so its easier to subtract
+    # using mins from midnight so its easier to subtract,( 12- 00 minutes, so number of hour* 60 for calculating minutes)
     # 480 = 8:00 AM, 510 = 8:30 AM, 540 = 9:00 AM, 600 = 10:00 AM
     raw_data = {
         'route': [
@@ -34,13 +34,13 @@ def load_transport_data():
         ]
     }
 
-    df = pd.DataFrame(raw_data)
+    df = pd.DataFrame(raw_data)  # df standard used for variable name representing dataframe in pandas
 
-    # arithmetic column for delay in mins
+    # arithmetic column for delay in mins ( calculates the delay time ) 
     df['delay_mins'] = df['actual_time'] - df['sched_time']
 
     # not sure if early bus (-2 mins) should be 0 or stay negative, leaving it for now
-    # df['delay_mins'] = df['delay_mins'].clip(lower=0)
+    
 
     # bus counts as late if delay is more than 5 mins
     df['is_late'] = df['delay_mins'] > 5
